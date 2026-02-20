@@ -1,0 +1,33 @@
+name: Auto-Update News Website
+
+# When should the robot wake up?
+on:
+  schedule:
+    - cron: '0 8 * * *' # Runs automatically every day at 8:00 AM UTC
+  workflow_dispatch: # Adds a button so you can run it manually anytime
+
+# What should the robot do?
+jobs:
+  build:
+    runs-on: ubuntu-latest # A free, temporary Linux computer
+
+    steps:
+      - name: 📥 Download your repository files
+        uses: actions/checkout@v4
+
+      - name: 🐍 Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: ⚙️ Run the news generator script
+        run: python generate_news.py
+
+      - name: 🚀 Save the new HTML and push to website
+        run: |
+          git config --global user.name 'NewsBot'
+          git config --global user.email 'action@github.com'
+          git add index.html
+          # Only commit if there are changes
+          git commit -m "🤖 Auto-update latest news" || exit 0
+          git push
